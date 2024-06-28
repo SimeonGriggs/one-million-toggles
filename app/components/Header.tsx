@@ -27,6 +27,12 @@ export function Header(props: {theme: ThemePreference}) {
               Open <a href="/studio">Sanity Studio</a> for this project to view
               content changes in the dashboard.
             </p>
+            <p>
+              <a href="https://github.com/SimeonGriggs/one-million-toggles">
+                Clone this project on GitHub
+              </a>
+              .
+            </p>
           </div>
         </div>
       </section>

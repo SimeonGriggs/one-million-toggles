@@ -23,9 +23,7 @@ export function SanityLive({syncTags = []}: {syncTags?: string[]}) {
         if ('id' in event) {
           setSearchParams(
             {lastLiveEventId: event.id},
-            {
-              preventScrollReset: true,
-            },
+            {preventScrollReset: true},
           )
         }
         revalidator.revalidate()
@@ -35,7 +33,7 @@ export function SanityLive({syncTags = []}: {syncTags?: string[]}) {
     return () => {
       subscription.unsubscribe()
     }
-  }, [])
+  }, [syncTags, revalidator, setSearchParams])
 
   return null
 }
