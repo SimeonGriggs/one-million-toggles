@@ -1,0 +1,27 @@
+import {useEffect, useState} from 'react'
+
+// Default export required for lazy loading
+// eslint-disable-next-line import/no-default-export
+export default function ExitPreview() {
+  const [inIframe, setInIframe] = useState(true)
+  useEffect(() => {
+    setInIframe(window.self !== window.top)
+  }, [])
+
+  return inIframe ? null : (
+    <div className="pointer-events-none fixed inset-0 flex h-screen w-screen items-end justify-end p-2">
+      <form
+        className="pointer-events-auto"
+        action="/resource/preview"
+        method="POST"
+      >
+        <button
+          className="bg-black p-4 leading-none font-bold text-white"
+          type="submit"
+        >
+          Exit Preview Mode
+        </button>
+      </form>
+    </div>
+  )
+}
