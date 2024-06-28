@@ -1,5 +1,6 @@
 import {Switch} from '@headlessui/react'
 import {useFetcher} from '@remix-run/react'
+import React, {useCallback} from 'react'
 
 type ToggleProps = {
   enabled: boolean
@@ -7,7 +8,7 @@ type ToggleProps = {
   _id: string
 }
 
-export function Toggle(props: ToggleProps) {
+function ToggleComponent(props: ToggleProps) {
   const fetcher = useFetcher<{enabled: boolean}>()
   let enabled = props.enabled
 
@@ -18,19 +19,22 @@ export function Toggle(props: ToggleProps) {
   }
 
   // Had to do this because of a bug with <Switch> not submitting on click
-  const handleChange = (value: boolean) => {
-    return fetcher.submit(
-      {
-        _id: props._id,
-        _key: props._key,
-        enabled: value,
-      },
-      {
-        action: '/resource/toggle',
-        method: 'POST',
-      },
-    )
-  }
+  const handleChange = useCallback(
+    (value: boolean) => {
+      return fetcher.submit(
+        {
+          _id: props._id,
+          _key: props._key,
+          enabled: value,
+        },
+        {
+          action: '/resource/toggle',
+          method: 'POST',
+        },
+      )
+    },
+    [fetcher, props._id, props._key],
+  )
 
   return (
     <fetcher.Form method="POST" action="/resource/toggle">
@@ -49,3 +53,10 @@ export function Toggle(props: ToggleProps) {
     </fetcher.Form>
   )
 }
+
+const areEqual = (prevProps: ToggleProps, nextProps: ToggleProps) => {
+  // Only re-render if the enabled prop has changed
+  return prevProps.enabled === nextProps.enabled
+}
+
+export const Toggle = React.memo(ToggleComponent, areEqual)

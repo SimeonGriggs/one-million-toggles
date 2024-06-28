@@ -1,26 +1,32 @@
-import type {LoaderFunctionArgs} from '@remix-run/node'
+import type {LoaderFunctionArgs, MetaFunction} from '@remix-run/node'
 import {useLoaderData} from '@remix-run/react'
+import React from 'react'
 
 import {SanityLive} from '~/components/SanityLive'
-import {Toggles} from '~/components/Toggles'
+import {Toggle} from '~/components/Toggle'
 import {client} from '~/sanity/client'
 import {TOGGLE_GROUPS_QUERY} from '~/sanity/queries'
 import type {ToggleGroup} from '~/types/toggleGroup'
 
-// export const meta: MetaFunction<
-//   typeof loader,
-//   {
-//     'routes/_website': typeof layoutLoader
-//   }
-// > = ({matches}) => {
-//   const layoutData = matches.find(
-//     (match) => match.id === `routes/_website`,
-//   )?.data
-//   const home = layoutData ? layoutData.initial.data : null
-//   const title = [home?.title, home?.siteTitle].filter(Boolean).join(' | ')
+export const meta: MetaFunction<typeof loader> = ({data}) => {
+  let count = 0
 
-//   return [{title}]
-// }
+  if (data) {
+    for (let groupIndex = 0; groupIndex < data.initial.length; groupIndex++) {
+      for (
+        let toggleIndex = 0;
+        toggleIndex < data.initial[groupIndex].toggles.length;
+        toggleIndex++
+      ) {
+        count++
+      }
+    }
+  }
+
+  const title = count === 1 ? `One Toggle` : `${count} Toggles`
+
+  return [{title}]
+}
 
 export const loader = async ({request}: LoaderFunctionArgs) => {
   let syncTags: string[] | undefined = []
@@ -46,7 +52,20 @@ export default function Index() {
   return (
     <>
       <SanityLive syncTags={syncTags} />
-      <Toggles toggles={initial} />
+      <div className="flex flex-wrap gap-3 p-3 justify-center">
+        {initial.map((group) => (
+          <React.Fragment key={group._id}>
+            {group.toggles.map((toggle) => (
+              <Toggle
+                key={toggle._key}
+                _id={group._id}
+                _key={toggle._key}
+                enabled={toggle.enabled}
+              />
+            ))}
+          </React.Fragment>
+        ))}
+      </div>
     </>
   )
 }
