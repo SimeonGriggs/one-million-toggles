@@ -1,6 +1,6 @@
 import groq from 'groq'
 
-export const TOGGLE_GROUPS_QUERY = groq`*[_type == "toggleGroup"][0...1]{
+export const TOGGLE_GROUPS_QUERY = groq`*[_type == "toggleGroup"]{
   _id,
   toggles[]{
     _key, 

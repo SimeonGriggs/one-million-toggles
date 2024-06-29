@@ -3,7 +3,7 @@ import {useLoaderData} from '@remix-run/react'
 import React, {useState} from 'react'
 
 import {SanityLive} from '~/components/SanityLive'
-import {Toggle} from '~/components/Toggle'
+import {Toggles} from '~/components/Toggles'
 import {client} from '~/sanity/client'
 import {TOGGLE_GROUPS_QUERY} from '~/sanity/queries'
 import type {ToggleGroup} from '~/types/toggleGroup'
@@ -13,7 +13,8 @@ export const meta: MetaFunction<typeof loader> = ({data}) => {
     return [{title: 'Loading...'}]
   }
 
-  const title = data.count === 1 ? `One Toggle` : `${data.count} Toggles`
+  const countFormatted = new Intl.NumberFormat().format(data.count)
+  const title = data.count === 1 ? `One Toggle` : `${countFormatted} Toggles`
 
   return [{title}]
 }
@@ -53,20 +54,7 @@ export default function Index() {
   return (
     <>
       <SanityLive syncTags={syncTags} setData={setData} />
-      <div className="flex flex-wrap gap-3 p-3 justify-center">
-        {data.map((group) => (
-          <React.Fragment key={group._id}>
-            {group.toggles.map((toggle) => (
-              <Toggle
-                key={toggle._key}
-                _id={group._id}
-                _key={toggle._key}
-                enabled={toggle.enabled}
-              />
-            ))}
-          </React.Fragment>
-        ))}
-      </div>
+      <Toggles data={data} />
     </>
   )
 }

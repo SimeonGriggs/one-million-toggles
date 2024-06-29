@@ -28,6 +28,7 @@
     "@sanity/ui": "^2.1.14",
     "@sanity/vision": "^3.44.0",
     "@sanity/visual-editing": "^1.8.22",
+    "@tanstack/react-virtual": "^3.8.1",
     "@vercel/remix": "latest",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.1.3",

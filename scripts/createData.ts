@@ -3,8 +3,9 @@ import type {KeyedObject, SanityDocumentLike, TypedObject} from 'sanity'
 import {getCliClient} from 'sanity/cli'
 
 const client = getCliClient()
-const TOGGLES_PER_DOCUMENT = 100
-const DOCUMENTS = 100
+const TOGGLES_PER_DOCUMENT = 1000
+const DOCUMENTS = 1000
+const SLICE_SIZE = 25
 
 async function createData() {
   console.log(`Create new data with...`)
@@ -33,20 +34,27 @@ async function createData() {
     })
   }
 
-  const transaction = client.transaction()
+  for (let i = 0; i < documents.length; i += SLICE_SIZE) {
+    const transaction = client.transaction()
 
-  for (let dataI = 0; dataI < documents.length; dataI++) {
-    transaction.create(documents[dataI])
+    // Get the batch of documents
+    const batch = documents.slice(i, i + SLICE_SIZE)
+
+    // Create each document in the batch
+    for (let dataI = 0; dataI < batch.length; dataI++) {
+      transaction.create(batch[dataI])
+    }
+
+    // Commit the transaction for the current batch
+    try {
+      const res = await transaction.commit()
+      console.log(`Batch committed successfully!`, res)
+    } catch (err) {
+      console.error(`Error committing batch:`, err)
+    }
   }
 
-  transaction
-    .commit()
-    .then((res) => {
-      console.log(`Complete!`, res)
-    })
-    .catch((err) => {
-      console.error(err)
-    })
+  console.log('All documents processed!')
 }
 
 createData()

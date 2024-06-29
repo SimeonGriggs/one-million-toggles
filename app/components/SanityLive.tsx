@@ -10,7 +10,7 @@ type SanityLiveProps = {
 }
 
 export function SanityLive({syncTags = [], setData}: SanityLiveProps) {
-  const fetcher = useFetcher<typeof websiteIndexLoader>({key: 'sanity-live'})
+  const fetcher = useFetcher<typeof websiteIndexLoader>()
 
   useEffect(() => {
     const subscription = client
@@ -33,7 +33,7 @@ export function SanityLive({syncTags = [], setData}: SanityLiveProps) {
     return () => {
       subscription.unsubscribe()
     }
-  }, [fetcher, syncTags])
+  }, [syncTags])
 
   // Fetcher does not revalidate, so we need to do it manually
   useEffect(() => {
