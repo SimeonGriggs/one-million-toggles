@@ -12,10 +12,10 @@ function ToggleComponent(props: ToggleProps) {
   const fetcher = useFetcher<{enabled: boolean}>()
   let enabled = props.enabled
 
-  if (fetcher.data) {
+  if (fetcher.formData) {
+    enabled = Boolean(fetcher.formData.get('enabled'))
+  } else if (fetcher.data) {
     enabled = Boolean(fetcher.data.enabled)
-  } else if (fetcher.formData) {
-    enabled = !fetcher.formData.get('enabled')
   }
 
   // Had to do this because of a bug with <Switch> not submitting on click
@@ -42,6 +42,7 @@ function ToggleComponent(props: ToggleProps) {
       <input type="hidden" name="_id" value={props._id} />
       <Switch
         // Bug: Submit only works with keyboard, not click
+        // https://github.com/tailwindlabs/headlessui/issues/3343
         // type="submit"
         checked={enabled}
         onChange={handleChange}

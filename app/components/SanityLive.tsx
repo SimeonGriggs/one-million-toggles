@@ -1,39 +1,48 @@
-import {useRevalidator, useSearchParams} from '@remix-run/react'
+import {useFetcher} from '@remix-run/react'
 import {useEffect} from 'react'
 
+import type {loader as websiteIndexLoader} from '~/routes/_website._index'
 import {client} from '~/sanity/client'
 
-export function SanityLive({syncTags = []}: {syncTags?: string[]}) {
-  const revalidator = useRevalidator()
-  const [
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    searchParams,
-    setSearchParams,
-  ] = useSearchParams()
+type SanityLiveProps = {
+  syncTags: string[]
+  setData: (data: any) => void
+}
+
+export function SanityLive({syncTags = [], setData}: SanityLiveProps) {
+  const fetcher = useFetcher<typeof websiteIndexLoader>({key: 'sanity-live'})
 
   useEffect(() => {
-    const subscription = client.live.events().subscribe((event) => {
-      if (
-        // If any of the event tags match our stored syncTags, refetch the data, update our local cache and sync tags and "re-render" it.
-        (event.type === 'message' &&
-          event.tags.some((tag) => syncTags.includes(tag))) ||
-        // A restart event is sent when the `lastLiveEventId` we've been given earlier is no longer usable
-        event.type === 'restart'
-      ) {
-        if ('id' in event) {
-          setSearchParams(
+    const subscription = client
+      .withConfig({apiVersion: 'vX'})
+      .live.events()
+      .subscribe((event) => {
+        if (
+          event.type === 'message' &&
+          event.tags.some((t) => syncTags.includes(t))
+        ) {
+          // This will perform a GET request to the current URL with a search param
+          // But it will not revalidate the loader, the updated data is returned to fetcher.data
+          fetcher.submit(
             {lastLiveEventId: event.id},
-            {preventScrollReset: true},
+            {action: '/?index', method: 'GET'},
           )
         }
-        revalidator.revalidate()
-      }
-    })
+      })
 
     return () => {
       subscription.unsubscribe()
     }
-  }, [syncTags, revalidator, setSearchParams])
+  }, [fetcher, syncTags])
+
+  // Fetcher does not revalidate, so we need to do it manually
+  useEffect(() => {
+    if (fetcher.data) {
+      setData(fetcher.data.initial)
+      // Causes infinite loop
+      // revalidator.revalidate()
+    }
+  }, [fetcher.data, setData])
 
   return null
 }

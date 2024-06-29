@@ -10,7 +10,19 @@ export const structure: StructureResolver = (S) =>
   S.list()
     .id('root')
     .title('Content')
-    .items([S.documentTypeListItem('toggleGroup').title('Toggle Groups')])
+    .items([
+      S.documentTypeListItem('toggleGroup').title('Toggle Groups'),
+      S.listItem()
+        .id('siteMeta')
+        .schemaType('siteMeta')
+        .title('Site Meta')
+        .child(
+          S.editor()
+            .id('siteMeta')
+            .schemaType('siteMeta')
+            .documentId('siteMeta'),
+        ),
+    ])
 
 export const defaultDocumentNode: DefaultDocumentNodeResolver = (
   S,

@@ -19,7 +19,7 @@ export const action = async ({request}: ActionFunctionArgs) => {
     .set({
       [`toggles[_key == "${_key.toString()}"].enabled`]: nowEnabled,
     })
-    .commit()
+    .commit({visibility: 'async'})
 
   return json({enabled: nowEnabled})
 }

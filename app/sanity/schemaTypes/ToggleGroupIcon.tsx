@@ -21,7 +21,7 @@ export function ToggleGroupIcon(props: ToggleGroupIconProps) {
   // const completionStroke = theme.sanity.v2?.color.badge.positive.fg
   const baseStroke = '#efefef'
   const completionStroke = '#ace975'
-  console.log({baseStroke, completionStroke})
+
   return (
     <svg
       width={radius * 2}
